@@ -145,8 +145,11 @@ class Adan(Optimizer):
 
             global_grad_norm = torch.sqrt(global_grad_norm)
 
+            # group is whichever param group the loop finished on, so a
+            # later group's eps was changing the global clip. The clip is
+            # one number for every group; use the eps passed to Adan.
             clip_global_grad_norm = torch.clamp(
-                max_grad_norm / (global_grad_norm + group['eps']),
+                max_grad_norm / (global_grad_norm + self.defaults['eps']),
                 max=1.0).item()
         else:
             clip_global_grad_norm = 1.0
